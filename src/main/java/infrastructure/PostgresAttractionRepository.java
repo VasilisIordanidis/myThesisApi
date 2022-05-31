@@ -59,12 +59,57 @@ public class PostgresAttractionRepository implements AttractionRepository {
     }
 
     @Override
-    public Completable addAttraction(){
-        return Completable.create(emitter -> {});
+    public Completable addAttraction(String id, String name, Double rating, int total_reviews, String url, String address){
+        return Completable.create(emitter -> pool.getConnection()
+                .onFailure(error -> {
+                    System.out.println(error.getCause().getMessage());
+                    emitter.onError(error);
+                })
+                .onSuccess(connection -> {
+                    connection.preparedQuery("INSERT INTO myThesisDB.Public.Attraction (account_id,name,rating,total_reviews,photo_url,address) VALUES (?, ?, ?, ?, ?, ?)")
+                            .execute(Tuple.of(id, name, rating, total_reviews, url, address))
+                            .onFailure(error -> {
+                                System.out.println(error.getCause().getMessage());
+                                emitter.onError(error);
+                                connection.close();
+                            })
+                            .onSuccess(rows -> {
+                               if(rows.rowCount() > 0){
+                                   emitter.onComplete();
+                               }
+                               else{
+                                   emitter.onError(new Throwable("Error at insert"));
+                               }
+                               connection.close();
+                            });
+
+                }));
     }
 
     @Override
-    public Completable removeAttraction(){
-        return Completable.create(emitter -> {});
+    public Completable removeAttraction(String id, String name, String address){
+
+        return Completable.create(emitter -> pool.getConnection()
+                .onFailure(error -> {
+                    System.out.println(error.getCause().getMessage());
+                    emitter.onError(error);
+                })
+                .onSuccess(connection -> connection.preparedQuery("DELETE FROM myThesisDB.public.Attractions WHERE account_id=? AND name=? AND address = ?")
+                        .execute(Tuple.of(id, name, address))
+                        .onFailure(error -> {
+                            System.out.println(error.getCause().getMessage());
+                            emitter.onError(error);
+                            connection.close();
+                        })
+                        .onSuccess(rows -> {
+                            if(rows.rowCount()>0){
+                                emitter.onComplete();
+                            }else {
+                                emitter.onError(new Throwable("error at delete"));
+                            }
+                            connection.close();
+                        })
+                )
+        );
     }
 }

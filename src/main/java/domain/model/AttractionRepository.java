@@ -8,6 +8,6 @@ import java.util.Set;
 
 public interface AttractionRepository {
     Maybe<Set<Attraction>> getSavedAttractions(String id);
-    Completable addAttraction();
-    Completable removeAttraction();
+    Completable addAttraction(String id, String name, Double rating, int total_reviews, String url, String address);
+    Completable removeAttraction(String id, String name, String address);
 }
