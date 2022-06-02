@@ -5,6 +5,7 @@ import domain.model.AccountRepository;
 import domain.model.Attraction;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.jdbcclient.JDBCPool;
@@ -24,8 +25,8 @@ public class PostgresAccountRepository implements AccountRepository {
     private final JDBCPool pool = JDBCPool.pool(vertx, config);
 
     @Override
-    public Maybe<Account> logIn(String username, String password) {
-        return Maybe.create(emitter -> pool.getConnection()
+    public Single<Account> logIn(String username, String password) {
+        return Single.create(emitter -> pool.getConnection()
                 .onFailure(error -> {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
@@ -42,7 +43,7 @@ public class PostgresAccountRepository implements AccountRepository {
                                 }
                                 emitter.onSuccess(account);
                             } else {
-                                emitter.onComplete();
+                                emitter.onError(new Throwable("Error at log in"));
                             }
                             connection.close();
                         }))
@@ -140,7 +141,7 @@ public class PostgresAccountRepository implements AccountRepository {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM myThesisDB.public.Account WHERE myThesisDB.public.Account.id  ?")
+                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM myThesisDB.public.Account WHERE myThesisDB.public.Account.id = ?")
                         .execute(Tuple.of(id))
                         .onFailure(error -> {
                             System.out.println(error.getCause().getMessage());
