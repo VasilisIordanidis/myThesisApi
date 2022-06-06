@@ -14,7 +14,7 @@ public class UserApplicationService {
         this.accountRepository = accountRepository;
     }
 
-    public Completable createUser(CreateUserCommand command){
+    public Completable execute(CreateUserCommand command){
         return this.accountRepository.getAccountById(command.getAccountId())
                 .isEmpty()
                 .flatMapCompletable(empty -> {
@@ -27,7 +27,7 @@ public class UserApplicationService {
                 });
     }
 
-    public Completable deleteUser(DeleteUserCommand command){
+    public Completable execute(DeleteUserCommand command){
         return this.accountRepository.getAccountById(command.getId())
                 .isEmpty()
                 .flatMapCompletable(empty -> {
