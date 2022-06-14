@@ -3,12 +3,10 @@ package domain.application;
 import domain.application.command.CreateUserCommand;
 import domain.application.command.DeleteUserCommand;
 import domain.application.query.LogInQuery;
-import domain.model.Account;
 import domain.model.AccountRepository;
 import domain.model.AccountView;
 import domain.model.AccountViewRepository;
 import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 
 public class UserApplicationService {

@@ -6,11 +6,14 @@ import domain.application.command.AddAttractionCommand;
 import domain.application.command.CreateUserCommand;
 import domain.application.command.DeleteUserCommand;
 import domain.application.command.RemoveAttractionCommand;
+import domain.application.query.LogInQuery;
 import domain.model.Account;
+import domain.model.Attraction;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 
@@ -28,6 +31,23 @@ public class HttpServerVerticle extends AbstractVerticle {
 
     @Override
     public void start()  {
+        router.get("/api/user").consumes("*/json").produces("*/json").handler(context -> {
+            LogInQuery logInQuery = new LogInQuery();
+            userApplicationService.execute(logInQuery).subscribe(
+                    accountView -> {
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.put("username",accountView.getUsername());
+                        JsonArray jsonArray = new JsonArray();
+                        for(Attraction attraction : accountView.getAttractionSet()){
+
+                        }
+                        context.response().write(jsonObject.toString());
+                    },
+                    onError -> {
+
+                    }
+            );
+        });
         router.post("/api/user").consumes("*/json").produces("*/json").handler(context -> {
             context.response().setChunked(true);
             JsonObject jsonObject = context.getBodyAsJson();
