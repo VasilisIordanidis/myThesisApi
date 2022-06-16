@@ -6,6 +6,7 @@ import domain.application.command.AddAttractionCommand;
 import domain.application.command.CreateUserCommand;
 import domain.application.command.DeleteUserCommand;
 import domain.application.command.RemoveAttractionCommand;
+import domain.application.query.GetSavedAttractionsQuery;
 import domain.application.query.LogInQuery;
 import domain.model.Account;
 import domain.model.Attraction;
@@ -39,15 +40,50 @@ public class HttpServerVerticle extends AbstractVerticle {
                         jsonObject.put("username",accountView.getUsername());
                         JsonArray jsonArray = new JsonArray();
                         for(Attraction attraction : accountView.getAttractionSet()){
-
+                            JsonObject attractionJson = new JsonObject().put("name",attraction.getName())
+                                    .put("address",attraction.getAddress())
+                                    .put("total_reviews",attraction.getTotalReviews())
+                                    .put("rating",attraction.getRating())
+                                    .put("photo",attraction.getImage());
+                            jsonArray.add(attractionJson);
                         }
+                        jsonObject.put("attractions",jsonArray);
                         context.response().write(jsonObject.toString());
+                        context.response().end();
                     },
                     onError -> {
-
+                        context.response().write(onError.getMessage());
+                        context.response().end();
                     }
             );
         });
+        router.get("/api/user/:id/attractions").consumes("*/json").produces("*/json").handler(context -> {
+            GetSavedAttractionsQuery query = new GetSavedAttractionsQuery(context.pathParam("id"));
+            attractionApplicationService.execute(query).subscribe(
+                    attractions -> {
+                        JsonArray array = new JsonArray();
+                        for(Attraction attraction : attractions){
+                            JsonObject attractionJson = new JsonObject().put("name",attraction.getName())
+                                    .put("address",attraction.getAddress())
+                                    .put("total_reviews",attraction.getTotalReviews())
+                                    .put("rating",attraction.getRating())
+                                    .put("photo",attraction.getImage());
+                            array.add(attractionJson);
+                        }
+                        JsonObject res = new JsonObject().put("attractions",array);
+                        context.response().write(res.toString());
+                        context.response().end();
+                    },
+                    onError -> {
+                        context.response().write(onError.getMessage());
+                        context.response().end();
+                    },
+                    () -> {
+                        context.response().end();
+                    }
+            );
+        });
+
         router.post("/api/user").consumes("*/json").produces("*/json").handler(context -> {
             context.response().setChunked(true);
             JsonObject jsonObject = context.getBodyAsJson();
