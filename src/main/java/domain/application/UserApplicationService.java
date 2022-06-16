@@ -9,6 +9,8 @@ import domain.model.AccountViewRepository;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 
+import java.util.UUID;
+
 public class UserApplicationService {
     private final AccountRepository accountRepository;
     private final AccountViewRepository accountViewRepository;
@@ -32,7 +34,7 @@ public class UserApplicationService {
                     if (!empty) {
                         return Completable.error(new Throwable("User already exists"));
                     } else {
-                        return this.accountRepository.createAccount(command.getFirstName(), command.getLastName(), command.getEmail(), command.getAccountId(), command.getUsername(), command.getPassword());
+                        return this.accountRepository.createAccount(command.getFirstName(), command.getLastName(), command.getEmail(), UUID.randomUUID().toString(), command.getUsername(), command.getPassword());
 
                     }
                 });
