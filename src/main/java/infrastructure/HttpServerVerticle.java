@@ -8,7 +8,6 @@ import domain.application.command.DeleteUserCommand;
 import domain.application.command.RemoveAttractionCommand;
 import domain.application.query.GetSavedAttractionsQuery;
 import domain.application.query.LogInQuery;
-import domain.model.Account;
 import domain.model.Attraction;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
