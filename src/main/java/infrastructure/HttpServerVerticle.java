@@ -16,6 +16,7 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 
 public class HttpServerVerticle extends AbstractVerticle {
     private final Vertx vertx = Vertx.vertx();
@@ -31,6 +32,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 
     @Override
     public void start()  {
+        router.route().handler(BodyHandler.create());
         router.get("/api/user").consumes("*/json").produces("*/json").handler(context -> {
             LogInQuery logInQuery = new LogInQuery();
             userApplicationService.execute(logInQuery).subscribe(
@@ -89,10 +91,10 @@ public class HttpServerVerticle extends AbstractVerticle {
             String firstName = jsonObject.getString("firstName");
             String lastName = jsonObject.getString("lastName");
             String email = jsonObject.getString("email");
-            String id = jsonObject.getString("id");
+            //String id = jsonObject.getString("id");
             String username = jsonObject.getString("username");
             String password = jsonObject.getString("password");
-            CreateUserCommand createUserCommand = new CreateUserCommand(firstName,lastName,email,username,password,id);
+            CreateUserCommand createUserCommand = new CreateUserCommand(firstName,lastName,email,username,password);
             userApplicationService.execute(createUserCommand).subscribe(
                     () -> {
                         context.response().end();
@@ -124,7 +126,7 @@ public class HttpServerVerticle extends AbstractVerticle {
             );
         });
 
-        router.delete("api/user/:id").consumes("*/json").produces("*/json").handler(context -> {
+        router.delete("/api/user/:id").consumes("*/json").produces("*/json").handler(context -> {
             String id = context.pathParam("id");
             DeleteUserCommand deleteUserCommand = new DeleteUserCommand(id);
             userApplicationService.execute(deleteUserCommand).subscribe(
@@ -138,7 +140,7 @@ public class HttpServerVerticle extends AbstractVerticle {
             );
         });
 
-        router.delete("api/user/:id/attractions").consumes("*/json").produces("*/json").handler(context -> {
+        router.delete("/api/user/:id/attractions").consumes("*/json").produces("*/json").handler(context -> {
             JsonObject jsonObject = context.getBodyAsJson();
             String id = context.pathParam("id");
             String name = jsonObject.getString("name");
@@ -165,12 +167,12 @@ public class HttpServerVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void stop(Promise<Void> stopPromise) {
+    public void stop() {
         server.close(res -> {
             if (res.succeeded()) {
-                stopPromise.complete();
+                System.out.println("Server closed");
             } else {
-                stopPromise.fail(res.cause());
+                System.out.println("Error");
             }
         });
     }

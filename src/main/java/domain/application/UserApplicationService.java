@@ -28,26 +28,25 @@ public class UserApplicationService {
     }
 
     public Completable execute(CreateUserCommand command) {
-        return this.accountRepository.getAccountById(command.getAccountId())
+        return this.accountRepository.getAccountById(UUID.fromString(command.getAccountId()))
                 .isEmpty()
                 .flatMapCompletable(empty -> {
                     if (!empty) {
                         return Completable.error(new Throwable("User already exists"));
                     } else {
-                        return this.accountRepository.createAccount(command.getFirstName(), command.getLastName(), command.getEmail(), UUID.randomUUID().toString(), command.getUsername(), command.getPassword());
-
+                        return this.accountRepository.createAccount(command.getFirstName(), command.getLastName(), command.getEmail(), UUID.fromString(command.getAccountId()), command.getUsername(), command.getPassword());
                     }
                 });
     }
 
     public Completable execute(DeleteUserCommand command) {
-        return this.accountRepository.getAccountById(command.getId())
+        return this.accountRepository.getAccountById(UUID.fromString(command.getId()))
                 .isEmpty()
                 .flatMapCompletable(empty -> {
                     if (empty) {
                         return Completable.error(new Throwable("User does not exist"));
                     } else {
-                        return this.accountRepository.deleteAccount(command.getId());
+                        return this.accountRepository.deleteAccount(UUID.fromString(command.getId()));
                     }
                 });
     }

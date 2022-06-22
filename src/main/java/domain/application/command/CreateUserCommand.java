@@ -1,5 +1,7 @@
 package domain.application.command;
 
+import java.util.UUID;
+
 public class CreateUserCommand {
     String firstName;
     String lastName;
@@ -11,13 +13,13 @@ public class CreateUserCommand {
     public CreateUserCommand() {
     }
 
-    public CreateUserCommand(String firstName, String lastName, String email, String username, String password, String accountId) {
+    public CreateUserCommand(String firstName, String lastName, String email, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.username = username;
         this.password = password;
-        this.accountId = accountId;
+        this.accountId = UUID.randomUUID().toString();
     }
 
     public String getFirstName() {

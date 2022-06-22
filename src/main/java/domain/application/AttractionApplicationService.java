@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.core.Maybe;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class AttractionApplicationService {
     private final AttractionRepository attractionRepository;
@@ -22,7 +23,7 @@ public class AttractionApplicationService {
     }
 
     public Maybe<Set<Attraction>> execute(GetSavedAttractionsQuery query){
-        return accountRepository.getAccountById(query.getAccountId())
+        return accountRepository.getAccountById(UUID.fromString(query.getAccountId()))
                 .isEmpty()
                 .flatMapMaybe(empty -> {
                    if(empty){
@@ -42,7 +43,7 @@ public class AttractionApplicationService {
     }
 
     public Completable execute(AddAttractionCommand command){
-        return accountRepository.getAccountById(command.getAccountId())
+        return accountRepository.getAccountById(UUID.fromString(command.getAccountId()))
                 .isEmpty()
                 .flatMapCompletable(empty -> {
                     if(empty){
@@ -58,7 +59,7 @@ public class AttractionApplicationService {
     }
 
     public Completable execute(RemoveAttractionCommand command){
-        return accountRepository.getAccountById(command.getAccountId())
+        return accountRepository.getAccountById(UUID.fromString(command.getAccountId()))
                 .isEmpty()
                 .flatMapCompletable(empty -> {
                     if(empty){
