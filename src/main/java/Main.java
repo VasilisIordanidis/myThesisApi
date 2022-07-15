@@ -7,6 +7,8 @@ import infrastructure.*;
 import io.vertx.core.Vertx;
 public class Main {
     public static void main(String[] args) {
+        System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
+        System.setProperty("com.mchange.v2.log.MLog", "com.mchange.v2.log.FallbackMLog");
         Vertx vertx = Vertx.vertx();
 
         AccountRepository accountRepository = new PostgresAccountRepository();

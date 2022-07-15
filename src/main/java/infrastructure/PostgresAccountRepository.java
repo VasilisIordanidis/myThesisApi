@@ -32,10 +32,10 @@ public class PostgresAccountRepository implements AccountRepository {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM myThesisDB.public.Account WHERE username = ? AND password = ?")
+                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM public.\"Account\" WHERE username = ? AND password = ?")
                         .execute(Tuple.of(username, password))
                         .onSuccess(rows -> {
-                            if (rows.size() == 1) {
+                            //if (rows.size() == 1) {
                                 Account account = new Account();
                                 for (Row row : rows) {
                                     account.setUuid(row.getString("id"));
@@ -43,9 +43,11 @@ public class PostgresAccountRepository implements AccountRepository {
                                     account.setPassword(row.getString("password"));
                                 }
                                 emitter.onSuccess(account);
-                            } else {
-                                emitter.onError(new Throwable("Error at log in"));
-                            }
+                            //}
+//
+//                            else {
+//                                emitter.onError(new Throwable("Error at log in"));
+//                            }
                             connection.close();
                         }))
         );

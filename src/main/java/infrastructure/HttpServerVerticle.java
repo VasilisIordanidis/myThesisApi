@@ -34,7 +34,11 @@ public class HttpServerVerticle extends AbstractVerticle {
     public void start()  {
         router.route().handler(BodyHandler.create());
         router.get("/api/user").consumes("*/json").produces("*/json").handler(context -> {
-            LogInQuery logInQuery = new LogInQuery();
+            context.response().setChunked(true);
+            JsonObject bodyAsJson = context.getBodyAsJson();
+            String username = bodyAsJson.getString("username");
+            String password = bodyAsJson.getString("password");
+            LogInQuery logInQuery = new LogInQuery(username, password);
             userApplicationService.execute(logInQuery).subscribe(
                     accountView -> {
                         JsonObject jsonObject = new JsonObject();
@@ -59,6 +63,7 @@ public class HttpServerVerticle extends AbstractVerticle {
             );
         });
         router.get("/api/user/:id/attractions").consumes("*/json").produces("*/json").handler(context -> {
+            context.response().setChunked(true);
             GetSavedAttractionsQuery query = new GetSavedAttractionsQuery(context.pathParam("id"));
             attractionApplicationService.execute(query).subscribe(
                     attractions -> {
@@ -107,6 +112,7 @@ public class HttpServerVerticle extends AbstractVerticle {
         });
 
         router.post("/api/user/:id/attractions").consumes("*/json").produces("*/json").handler(context -> {
+            context.response().setChunked(true);
             JsonObject jsonObject = context.getBodyAsJson();
             String name = jsonObject.getString("name");
             String address = jsonObject.getString("address");
@@ -119,7 +125,6 @@ public class HttpServerVerticle extends AbstractVerticle {
             attractionApplicationService.execute(addAttractionCommand).subscribe(
                     () -> context.response().end(),
                     onError -> {
-                        context.response().setChunked(true);
                         context.response().write(onError.getMessage());
                         context.response().end();
                     }
@@ -127,13 +132,13 @@ public class HttpServerVerticle extends AbstractVerticle {
         });
 
         router.delete("/api/user/:id").consumes("*/json").produces("*/json").handler(context -> {
+            context.response().setChunked(true);
             String id = context.pathParam("id");
             DeleteUserCommand deleteUserCommand = new DeleteUserCommand(id);
             userApplicationService.execute(deleteUserCommand).subscribe(
                     () -> context.response().end(),
                     onError -> {
                         context.response().setStatusCode(404);
-                        context.response().setChunked(true);
                         context.response().write(onError.getMessage());
                         context.response().end();
                     }
@@ -141,6 +146,7 @@ public class HttpServerVerticle extends AbstractVerticle {
         });
 
         router.delete("/api/user/:id/attractions").consumes("*/json").produces("*/json").handler(context -> {
+            context.response().setChunked(true);
             JsonObject jsonObject = context.getBodyAsJson();
             String id = context.pathParam("id");
             String name = jsonObject.getString("name");
@@ -150,7 +156,6 @@ public class HttpServerVerticle extends AbstractVerticle {
                     () -> context.response().end(),
                     onError -> {
                         context.response().setStatusCode(404);
-                        context.response().setChunked(true);
                         context.response().write(onError.getMessage());
                         context.response().end();
                     }
