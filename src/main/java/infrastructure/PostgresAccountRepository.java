@@ -2,7 +2,6 @@ package infrastructure;
 
 import domain.model.Account;
 import domain.model.AccountRepository;
-import domain.model.Attraction;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
@@ -12,8 +11,6 @@ import io.vertx.jdbcclient.JDBCPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class PostgresAccountRepository implements AccountRepository {
@@ -101,7 +98,7 @@ public class PostgresAccountRepository implements AccountRepository {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("DELETE FROM myThesisDB.public.User WHERE account_id=?")
+                .onSuccess(connection -> connection.preparedQuery("DELETE FROM public.\"User\" WHERE account_id=?")
                         .execute(Tuple.of(id))
                         .onFailure(error -> {
                             System.out.println(error.getCause().getMessage());
@@ -110,7 +107,7 @@ public class PostgresAccountRepository implements AccountRepository {
                         })
                         .onSuccess(rows -> {
                             if (rows.rowCount() > 0) {
-                                connection.preparedQuery("DELETE FROM myThesisDB.public.Account WHERE id=?")
+                                connection.preparedQuery("DELETE FROM public.\"Account\" WHERE id=?")
                                         .execute(Tuple.of(id))
                                         .onFailure(error -> {
                                             System.out.println(error.getCause().getMessage());
@@ -118,7 +115,7 @@ public class PostgresAccountRepository implements AccountRepository {
                                         })
                                         .onSuccess(rows1 -> {
                                             if (rows1.rowCount() > 0) {
-                                                connection.preparedQuery("DELETE FROM myThesisDB.public.Attraction WHERE account_id=?")
+                                                connection.preparedQuery("DELETE FROM public.\"Attraction\" WHERE account_id=?")
                                                         .execute(Tuple.of(id))
                                                         .onFailure(error -> {
                                                             System.out.println(error.getCause().getMessage());

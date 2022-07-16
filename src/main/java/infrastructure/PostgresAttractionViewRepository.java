@@ -40,14 +40,6 @@ public class PostgresAttractionViewRepository implements AccountViewRepository {
                             AccountView accountView = new AccountView();
                             for(Row row : rows){
                                 accountView.setUsername(row.getString("username"));
-//                                Attraction attraction = new Attraction(
-//                                        row.getString("name"),
-//                                        row.getInteger("total_reviews"),
-//                                        row.getDouble("rating"),
-//                                        row.getString("url"),
-//                                        row.getString("address"));
-//                                accountView.getAttractionSet().add(attraction);
-//                                accountView.setUsername(row.getString("username"));
                                 connection.preparedQuery("SELECT * FROM public.\"Attraction\" WHERE public.\"Attraction\".account_id = ?")
                                         .execute(Tuple.of(UUID.fromString(id)))
                                         .onFailure(error -> {
