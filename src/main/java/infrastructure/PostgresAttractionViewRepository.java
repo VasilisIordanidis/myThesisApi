@@ -29,10 +29,10 @@ public class PostgresAttractionViewRepository implements AccountViewRepository {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM public.\"Account\" WHERE public.\"Account\".id = ? ")
+                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM public.\"Account\" WHERE public.\"Account\".\"id\" = ? ")
                         .execute(Tuple.of(UUID.fromString(id)))
                         .onFailure(error ->{
-                            //System.out.println(error.getCause().getMessage());
+                            System.out.println(error.getCause().toString());
                             emitter.onError(error);
                             connection.close();
                         })
@@ -40,7 +40,7 @@ public class PostgresAttractionViewRepository implements AccountViewRepository {
                             AccountView accountView = new AccountView();
                             for(Row row : rows){
                                 accountView.setUsername(row.getString("username"));
-                                connection.preparedQuery("SELECT * FROM public.\"Attraction\" WHERE public.\"Attraction\".account_id = ?")
+                                connection.preparedQuery("SELECT * FROM public.\"Attraction\" WHERE public.\"Attraction\".\"account_id\" = ?")
                                         .execute(Tuple.of(UUID.fromString(id)))
                                         .onFailure(error -> {
                                             emitter.onError(error);

@@ -35,9 +35,9 @@ public class HttpServerVerticle extends AbstractVerticle {
         router.route().handler(BodyHandler.create());
         router.get("/api/user").consumes("*/json").produces("*/json").handler(context -> {
             context.response().setChunked(true);
-            JsonObject bodyAsJson = context.getBodyAsJson();
-            String username = bodyAsJson.getString("username");
-            String password = bodyAsJson.getString("password");
+            String username = context.request().getParam("username");
+            String password = context.request().getParam("password");
+            System.out.println(username + password);
             LogInQuery logInQuery = new LogInQuery(username, password);
             userApplicationService.execute(logInQuery).subscribe(
                     accountView -> {
@@ -55,10 +55,12 @@ public class HttpServerVerticle extends AbstractVerticle {
                         jsonObject.put("attractions",jsonArray);
                         context.response().write(jsonObject.toString());
                         context.response().end();
+                        System.out.println("GET login");
                     },
                     onError -> {
                         context.response().write(onError.getMessage());
                         context.response().end();
+                        System.out.println("GET LOGIN error");
                     }
             );
         });

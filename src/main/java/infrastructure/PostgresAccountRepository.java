@@ -29,7 +29,7 @@ public class PostgresAccountRepository implements AccountRepository {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM public.\"Account\" WHERE username = ? AND password = ?")
+                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM public.\"Account\" WHERE public.\"Account\".\"username\" = ? AND public.\"Account\".\"password\" = ?")
                         .execute(Tuple.of(username, password))
                         .onSuccess(rows -> {
                             //if (rows.size() == 1) {
