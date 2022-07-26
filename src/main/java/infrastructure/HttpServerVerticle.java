@@ -53,14 +53,16 @@ public class HttpServerVerticle extends AbstractVerticle {
                             jsonArray.add(attractionJson);
                         }
                         jsonObject.put("attractions",jsonArray);
+                        System.out.println("GET login");
                         context.response().write(jsonObject.toString());
                         context.response().end();
-                        System.out.println("GET login");
+
                     },
                     onError -> {
+                        System.out.println("GET LOGIN error");
                         context.response().write(onError.getMessage());
                         context.response().end();
-                        System.out.println("GET LOGIN error");
+
                     }
             );
         });

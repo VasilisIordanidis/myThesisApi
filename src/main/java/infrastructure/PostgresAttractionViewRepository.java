@@ -43,6 +43,7 @@ public class PostgresAttractionViewRepository implements AccountViewRepository {
                                 connection.preparedQuery("SELECT * FROM public.\"Attraction\" WHERE public.\"Attraction\".\"account_id\" = ?")
                                         .execute(Tuple.of(UUID.fromString(id)))
                                         .onFailure(error -> {
+                                            System.out.println(error.getCause().toString());
                                             emitter.onError(error);
                                             connection.close();
                                         })

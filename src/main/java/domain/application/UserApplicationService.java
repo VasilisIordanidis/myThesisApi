@@ -22,7 +22,8 @@ public class UserApplicationService {
 
     public Single<AccountView> execute(LogInQuery query) {
         return this.accountRepository.logIn(query.getUsername(), query.getPassword())
-                .flatMap(account -> {
+                .concatMap(account -> {
+                    System.out.println(account.toString());
                     return accountViewRepository.getAccountDetails(account.getUuid());
                 });
     }
