@@ -90,7 +90,7 @@ public class PostgresAccountRepository implements AccountRepository {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("DELETE FROM public.\"User\" WHERE account_id=?")
+                .onSuccess(connection -> connection.preparedQuery("DELETE FROM public.\"User\" WHERE public.\"User\".\"account_id\"=?")
                         .execute(Tuple.of(id))
                         .onFailure(error -> {
                             System.out.println(error.getCause().getMessage());
@@ -99,7 +99,7 @@ public class PostgresAccountRepository implements AccountRepository {
                         })
                         .onSuccess(rows -> {
                             if (rows.rowCount() > 0) {
-                                connection.preparedQuery("DELETE FROM public.\"Account\" WHERE id=?")
+                                connection.preparedQuery("DELETE FROM public.\"Account\" WHERE public.\"Account\".\"id\"=?")
                                         .execute(Tuple.of(id))
                                         .onFailure(error -> {
                                             System.out.println(error.getCause().getMessage());
@@ -107,7 +107,7 @@ public class PostgresAccountRepository implements AccountRepository {
                                         })
                                         .onSuccess(rows1 -> {
                                             if (rows1.rowCount() > 0) {
-                                                connection.preparedQuery("DELETE FROM public.\"Attraction\" WHERE account_id=?")
+                                                connection.preparedQuery("DELETE FROM public.\"Attraction\" WHERE public.\"Attraction\".\"account_id\"=?")
                                                         .execute(Tuple.of(id))
                                                         .onFailure(error -> {
                                                             System.out.println(error.getCause().getMessage());

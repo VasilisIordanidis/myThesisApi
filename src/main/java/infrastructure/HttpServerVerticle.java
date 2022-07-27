@@ -31,7 +31,9 @@ public class HttpServerVerticle extends AbstractVerticle {
 
     @Override
     public void start()  {
+
         router.route().handler(BodyHandler.create());
+
         router.get("/api/user").produces("*/json").handler(context -> {
             context.response().setChunked(true);
             String username = context.request().getParam("username");
@@ -62,6 +64,7 @@ public class HttpServerVerticle extends AbstractVerticle {
                     }
             );
         });
+
         router.get("/api/user/:id/attractions").produces("*/json").handler(context -> {
             context.response().setChunked(true);
             GetSavedAttractionsQuery query = new GetSavedAttractionsQuery(context.pathParam("id"));
@@ -126,7 +129,7 @@ public class HttpServerVerticle extends AbstractVerticle {
             );
         });
 
-        router.delete("/api/user/:id").consumes("*/json").produces("*/json").handler(context -> {
+        router.delete("/api/user/:id").produces("*/json").handler(context -> {
             context.response().setChunked(true);
             String id = context.pathParam("id");
             DeleteUserCommand deleteUserCommand = new DeleteUserCommand(id);
