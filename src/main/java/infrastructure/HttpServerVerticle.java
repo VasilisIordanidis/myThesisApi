@@ -10,7 +10,6 @@ import domain.application.query.GetSavedAttractionsQuery;
 import domain.application.query.LogInQuery;
 import domain.model.Attraction;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonArray;
@@ -33,11 +32,10 @@ public class HttpServerVerticle extends AbstractVerticle {
     @Override
     public void start()  {
         router.route().handler(BodyHandler.create());
-        router.get("/api/user").consumes("*/json").produces("*/json").handler(context -> {
+        router.get("/api/user").produces("*/json").handler(context -> {
             context.response().setChunked(true);
             String username = context.request().getParam("username");
             String password = context.request().getParam("password");
-            System.out.println(username + password);
             LogInQuery logInQuery = new LogInQuery(username, password);
             userApplicationService.execute(logInQuery).subscribe(
                     accountView -> {
@@ -53,20 +51,18 @@ public class HttpServerVerticle extends AbstractVerticle {
                             jsonArray.add(attractionJson);
                         }
                         jsonObject.put("attractions",jsonArray);
-                        System.out.println("GET login");
                         context.response().write(jsonObject.toString());
                         context.response().end();
 
                     },
                     onError -> {
-                        System.out.println("GET LOGIN error");
+                        context.response().setStatusCode(400);
                         context.response().write(onError.getMessage());
                         context.response().end();
-
                     }
             );
         });
-        router.get("/api/user/:id/attractions").consumes("*/json").produces("*/json").handler(context -> {
+        router.get("/api/user/:id/attractions").produces("*/json").handler(context -> {
             context.response().setChunked(true);
             GetSavedAttractionsQuery query = new GetSavedAttractionsQuery(context.pathParam("id"));
             attractionApplicationService.execute(query).subscribe(
@@ -88,9 +84,7 @@ public class HttpServerVerticle extends AbstractVerticle {
                         context.response().write(onError.getMessage());
                         context.response().end();
                     },
-                    () -> {
-                        context.response().end();
-                    }
+                    () -> context.response().end()
             );
         });
 
@@ -105,9 +99,7 @@ public class HttpServerVerticle extends AbstractVerticle {
             String password = jsonObject.getString("password");
             CreateUserCommand createUserCommand = new CreateUserCommand(firstName,lastName,email,username,password);
             userApplicationService.execute(createUserCommand).subscribe(
-                    () -> {
-                        context.response().end();
-                    },
+                    () -> context.response().end(),
                     onError -> {
                         context.response().write(onError.getMessage());
                         context.response().end();
@@ -123,7 +115,6 @@ public class HttpServerVerticle extends AbstractVerticle {
             int totalReviews = jsonObject.getInteger("totalReviews");
             double rating = jsonObject.getDouble("rating");
             String url = jsonObject.getString("url");
-            String password = jsonObject.getString("password");
             String id = context.pathParam("id");
             AddAttractionCommand addAttractionCommand = new AddAttractionCommand(id,name,address,rating,totalReviews,url);
             attractionApplicationService.execute(addAttractionCommand).subscribe(

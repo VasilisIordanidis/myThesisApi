@@ -22,10 +22,7 @@ public class UserApplicationService {
 
     public Single<AccountView> execute(LogInQuery query) {
         return this.accountRepository.logIn(query.getUsername(), query.getPassword())
-                .concatMap(account -> {
-                    System.out.println(account.toString());
-                    return accountViewRepository.getAccountDetails(account.getUuid());
-                });
+                .concatMap(account -> accountViewRepository.getAccountDetails(account.getUuid()));
     }
 
     public Completable execute(CreateUserCommand command) {

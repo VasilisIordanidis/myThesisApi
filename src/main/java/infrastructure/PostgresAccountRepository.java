@@ -46,25 +46,13 @@ public class PostgresAccountRepository implements AccountRepository {
                                 }
                                 emitter.onSuccess(account);
                             }
-//
-                            else {
-                                System.out.println("eee");
-                                emitter.onError(new Throwable("Error at log in"));
+                            else if(rows.size()==0){
+                                emitter.onError(new Throwable("Wrong username or password"));
                             }
                             connection.close();
                         }))
         );
     }
-
-//    @Override
-//    public Completable logOut() {
-//        return Completable.create(emitter -> pool.getConnection()
-//                .onFailure(error -> {
-//                    System.out.println(error.getCause().getMessage());
-//                    emitter.onError(error);
-//                })
-//                .onSuccess(connection -> emitter.onComplete()));
-//    }
 
     @Override
     public Completable createAccount(String name, String surname, String email, UUID id, String username, String password) {
@@ -80,19 +68,17 @@ public class PostgresAccountRepository implements AccountRepository {
                             emitter.onError(error);
                             connection.close();
                         })
-                        .onSuccess(dummy -> {
-                            connection.preparedQuery("INSERT INTO public.\"Account\" (id, username, password) VALUES (?, ?, ?)")
-                                    .execute(Tuple.of(id, username, password))
-                                    .onFailure(error -> {
-                                        System.out.println(error.getCause().getMessage());
-                                        emitter.onError(error);
-                                        connection.close();
-                                    })
-                                    .onSuccess(dummy1 -> {
-                                        emitter.onComplete();
-                                        connection.close();
-                                    });
-                        })
+                        .onSuccess(dummy -> connection.preparedQuery("INSERT INTO public.\"Account\" (id, username, password) VALUES (?, ?, ?)")
+                                .execute(Tuple.of(id, username, password))
+                                .onFailure(error -> {
+                                    System.out.println(error.getCause().getMessage());
+                                    emitter.onError(error);
+                                    connection.close();
+                                })
+                                .onSuccess(dummy1 -> {
+                                    emitter.onComplete();
+                                    connection.close();
+                                }))
                 )
         );
     }
@@ -127,9 +113,7 @@ public class PostgresAccountRepository implements AccountRepository {
                                                             System.out.println(error.getCause().getMessage());
                                                             emitter.onError(error);
                                                         })
-                                                        .onSuccess(rows2 -> {
-                                                            emitter.onComplete();
-                                                        });
+                                                        .onSuccess(rows2 -> emitter.onComplete());
                                             } else {
                                                 emitter.onError(new Throwable("error at delete account"));
                                             }
