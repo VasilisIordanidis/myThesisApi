@@ -42,6 +42,7 @@ public class HttpServerVerticle extends AbstractVerticle {
             userApplicationService.execute(logInQuery).subscribe(
                     accountView -> {
                         JsonObject jsonObject = new JsonObject();
+                        jsonObject.put("id",accountView.getId());
                         jsonObject.put("username",accountView.getUsername());
                         JsonArray jsonArray = new JsonArray();
                         for(Attraction attraction : accountView.getAttractionSet()){

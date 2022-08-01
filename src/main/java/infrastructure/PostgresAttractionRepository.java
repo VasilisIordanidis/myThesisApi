@@ -29,7 +29,7 @@ public class PostgresAttractionRepository implements AttractionRepository {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM myThesisDB.public.Attraction WHERE account_id = ?")
+                .onSuccess(connection -> connection.preparedQuery("SELECT * FROM public.\"Attraction\" WHERE public.\"Attraction\".\"account_id\" = ?")
                         .execute(Tuple.of(id))
                         .onFailure(error -> {
                             System.out.println(error.getCause().getMessage());
@@ -66,7 +66,7 @@ public class PostgresAttractionRepository implements AttractionRepository {
                     emitter.onError(error);
                 })
                 .onSuccess(connection -> {
-                    connection.preparedQuery("INSERT INTO myThesisDB.Public.Attraction (account_id,name,rating,total_reviews,photo_url,address) VALUES (?, ?, ?, ?, ?, ?)")
+                    connection.preparedQuery("INSERT INTO public.\"Attraction\" (account_id,name,rating,total_reviews,photo_url,address) VALUES (?, ?, ?, ?, ?, ?)")
                             .execute(Tuple.of(id, name, rating, total_reviews, url, address))
                             .onFailure(error -> {
                                 System.out.println(error.getCause().getMessage());
@@ -94,7 +94,7 @@ public class PostgresAttractionRepository implements AttractionRepository {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("DELETE FROM myThesisDB.public.Attractions WHERE account_id=? AND name=? AND address = ?")
+                .onSuccess(connection -> connection.preparedQuery("DELETE FROM public.\"Attraction\" WHERE public.\"Attraction\".\"account_id\"=? AND public.\"Attraction\".\"name\"=? AND public.\"Attraction\".\"address\" = ?")
                         .execute(Tuple.of(id, name, address))
                         .onFailure(error -> {
                             System.out.println(error.getCause().getMessage());
