@@ -12,6 +12,7 @@ import io.vertx.sqlclient.Tuple;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class PostgresAttractionRepository implements AttractionRepository {
     private final Vertx vertx = Vertx.vertx();
@@ -30,7 +31,7 @@ public class PostgresAttractionRepository implements AttractionRepository {
                     emitter.onError(error);
                 })
                 .onSuccess(connection -> connection.preparedQuery("SELECT * FROM public.\"Attraction\" WHERE public.\"Attraction\".\"account_id\" = ?")
-                        .execute(Tuple.of(id))
+                        .execute(Tuple.of(UUID.fromString(id)))
                         .onFailure(error -> {
                             System.out.println(error.getCause().getMessage());
                             emitter.onError(error);
@@ -44,7 +45,7 @@ public class PostgresAttractionRepository implements AttractionRepository {
                                     attraction.setName(row.getString("name"));
                                     attraction.setRating(row.getDouble("rating"));
                                     attraction.setTotalReviews(row.getInteger("total_reviews"));
-                                    attraction.setImage(row.getString("image_url"));
+                                    attraction.setImage(row.getString("photo_url"));
                                     attraction.setAddress(row.getString("address"));
                                     attractionSet.add(attraction);
                                 }
@@ -67,9 +68,9 @@ public class PostgresAttractionRepository implements AttractionRepository {
                 })
                 .onSuccess(connection -> {
                     connection.preparedQuery("INSERT INTO public.\"Attraction\" (account_id,name,rating,total_reviews,photo_url,address) VALUES (?, ?, ?, ?, ?, ?)")
-                            .execute(Tuple.of(id, name, rating, total_reviews, url, address))
+                            .execute(Tuple.of(UUID.fromString(id), name, rating, total_reviews, url, address))
                             .onFailure(error -> {
-                                System.out.println(error.getCause().getMessage());
+                                System.out.println(error);
                                 emitter.onError(error);
                                 connection.close();
                             })

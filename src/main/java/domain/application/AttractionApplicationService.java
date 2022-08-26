@@ -49,11 +49,11 @@ public class AttractionApplicationService {
                     if(empty){
                         return Completable.error(new Throwable("Account doesn't exist"));
                     } else {
-                        return attractionRepository.getSavedAttractions(command.getAccountId())
-                                .flatMapCompletable(attractionSet -> {
-                                    //Attraction attraction = new Attraction()
-                                    return attractionRepository.addAttraction(command.getAccountId(), command.getAttractionName(), command.getRating(), command.getTotalReviews(), command.getImgUrl(), command.getLocation());
-                                });
+                        return attractionRepository.addAttraction(command.getAccountId(), command.getAttractionName(), command.getRating(),command.getTotalReviews(), command.getImgUrl(), command.getLocation());
+//                                .flatMap(attractionSet -> {
+//                                    //Attraction attraction = new Attraction()
+//                                    return attractionRepository.addAttraction(command.getAccountId(), command.getAttractionName(), command.getRating(), command.getTotalReviews(), command.getImgUrl(), command.getLocation());
+//                                });
                     }
                 });
     }

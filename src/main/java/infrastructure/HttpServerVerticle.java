@@ -118,7 +118,7 @@ public class HttpServerVerticle extends AbstractVerticle {
             String address = jsonObject.getString("address");
             int totalReviews = jsonObject.getInteger("totalReviews");
             double rating = jsonObject.getDouble("rating");
-            String url = jsonObject.getString("url");
+            String url = jsonObject.getString("imgUrl");
             String id = context.pathParam("id");
             AddAttractionCommand addAttractionCommand = new AddAttractionCommand(id,name,address,rating,totalReviews,url);
             attractionApplicationService.execute(addAttractionCommand).subscribe(
