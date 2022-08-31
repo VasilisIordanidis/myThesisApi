@@ -54,7 +54,7 @@ public class PostgresAttractionViewRepository implements AccountViewRepository {
                                                     attractionRow.getString("name"),
                                                     attractionRow.getInteger("total_reviews"),
                                                     attractionRow.getDouble("rating"),
-                                                    attractionRow.getString("url"),
+                                                    attractionRow.getString("photo_url"),
                                                     attractionRow.getString("address"));
                                                 accountView.getAttractionSet().add(attraction);
                                             }
