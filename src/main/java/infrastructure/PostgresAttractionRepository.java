@@ -4,6 +4,7 @@ import domain.model.Attraction;
 import domain.model.AttractionRepository;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.jdbcclient.JDBCPool;
@@ -24,8 +25,8 @@ public class PostgresAttractionRepository implements AttractionRepository {
     private final JDBCPool pool = JDBCPool.pool(vertx, config);
 
     @Override
-    public Maybe<Set<Attraction>> getSavedAttractions(String id){
-        return Maybe.create(emitter -> pool.getConnection()
+    public Single<Set<Attraction>> getSavedAttractions(String id){
+        return Single.create(emitter -> pool.getConnection()
                 .onFailure(error -> {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
@@ -38,21 +39,17 @@ public class PostgresAttractionRepository implements AttractionRepository {
                             connection.close();
                         })
                         .onSuccess(rows -> {
-                            if(rows.size()>0){
-                                Set<Attraction> attractionSet = new HashSet<>();
-                                for(Row row : rows){
-                                    Attraction attraction = new Attraction();
-                                    attraction.setName(row.getString("name"));
-                                    attraction.setRating(row.getDouble("rating"));
-                                    attraction.setTotalReviews(row.getInteger("total_reviews"));
-                                    attraction.setImage(row.getString("photo_url"));
-                                    attraction.setAddress(row.getString("address"));
-                                    attractionSet.add(attraction);
-                                }
-                                emitter.onSuccess(attractionSet);
-                            } else {
-                                emitter.onComplete();
+                            Set<Attraction> attractionSet = new HashSet<>();
+                            for(Row row : rows){
+                                Attraction attraction = new Attraction();
+                                attraction.setName(row.getString("name"));
+                                attraction.setRating(row.getDouble("rating"));
+                                attraction.setTotalReviews(row.getInteger("total_reviews"));
+                                attraction.setImage(row.getString("photo_url"));
+                                attraction.setAddress(row.getString("address"));
+                                attractionSet.add(attraction);
                             }
+                            emitter.onSuccess(attractionSet);
                             connection.close();
                         })
                 )
@@ -96,9 +93,9 @@ public class PostgresAttractionRepository implements AttractionRepository {
                     emitter.onError(error);
                 })
                 .onSuccess(connection -> connection.preparedQuery("DELETE FROM public.\"Attraction\" WHERE public.\"Attraction\".\"account_id\"=? AND public.\"Attraction\".\"name\"=? AND public.\"Attraction\".\"address\" = ?")
-                        .execute(Tuple.of(id, name, address))
+                        .execute(Tuple.of(UUID.fromString(id), name, address))
                         .onFailure(error -> {
-                            System.out.println(error.getCause().getMessage());
+                            System.out.println(error.getCause());
                             emitter.onError(error);
                             connection.close();
                         })

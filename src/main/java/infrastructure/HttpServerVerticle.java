@@ -87,8 +87,8 @@ public class HttpServerVerticle extends AbstractVerticle {
                     onError -> {
                         context.response().write(onError.getMessage());
                         context.response().end();
-                    },
-                    () -> context.response().end()
+                    }
+                    //() -> context.response().end()
             );
         });
 

@@ -8,6 +8,7 @@ import domain.model.Attraction;
 import domain.model.AttractionRepository;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,20 +23,20 @@ public class AttractionApplicationService {
         this.accountRepository = accountRepository;
     }
 
-    public Maybe<Set<Attraction>> execute(GetSavedAttractionsQuery query){
+    public Single<Set<Attraction>> execute(GetSavedAttractionsQuery query){
         return accountRepository.getAccountById(UUID.fromString(query.getAccountId()))
                 .isEmpty()
-                .flatMapMaybe(empty -> {
+                .flatMap(empty -> {
                    if(empty){
-                       return Maybe.error(new Throwable("Account doesn't exist"));
+                       return Single.error(new Throwable("Account doesn't exist"));
                    } else {
                        return attractionRepository.getSavedAttractions(query.getAccountId())
                                //.switchIfEmpty(Completable.error(new Throwable("Account doesn't exist")).toMaybe())
                                .flatMap(attractions -> {
                                   if (attractions.size()==0){
-                                      return Maybe.just(new HashSet<>());
+                                      return Single.just(new HashSet<>());
                                   } else {
-                                      return Maybe.just(attractions);
+                                      return Single.just(attractions);
                                   }
                                });
                    }
@@ -66,9 +67,9 @@ public class AttractionApplicationService {
                         return Completable.error(new Throwable("Account doesn't exist"));
                     } else {
                         return attractionRepository.getSavedAttractions(command.getAccountId())
-                                .isEmpty()
-                                .flatMapCompletable(emptySet -> {
-                                    if(emptySet){
+                                //.isEmpty()
+                                .flatMapCompletable(set -> {
+                                    if(set.isEmpty()){
                                         return Completable.error(new Throwable("No saved attractions"));
                                     } else {
                                         return attractionRepository.removeAttraction(command.getAccountId(), command.getAttractionName(), command.getAttractionLocation());
