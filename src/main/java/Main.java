@@ -1,8 +1,10 @@
 import domain.application.AttractionApplicationService;
+import domain.application.UploadsApplicationService;
 import domain.application.UserApplicationService;
 import domain.model.AccountRepository;
 import domain.model.AccountViewRepository;
 import domain.model.AttractionRepository;
+import domain.model.UploadRepository;
 import infrastructure.*;
 import io.vertx.core.Vertx;
 public class Main {
@@ -14,11 +16,13 @@ public class Main {
         AccountRepository accountRepository = new PostgresAccountRepository();
         AttractionRepository attractionRepository=new PostgresAttractionRepository();
         AccountViewRepository accountViewRepository = new PostgresAttractionViewRepository();
+        UploadRepository uploadRepository = new PostgresUploadsRepository();
 
         AttractionApplicationService attractionApplicationService  = new AttractionApplicationService(attractionRepository,accountRepository);
         UserApplicationService userApplicationService  = new UserApplicationService(accountRepository,accountViewRepository);
-
-        vertx.deployVerticle(new HttpServerVerticle(userApplicationService,attractionApplicationService));
+        UploadsApplicationService uploadsApplicationService = new UploadsApplicationService(uploadRepository);
+        UploadsApplicationService applicationService = new UploadsApplicationService(uploadRepository);
+        vertx.deployVerticle(new HttpServerVerticle(userApplicationService,attractionApplicationService,uploadsApplicationService));
         vertx.deployVerticle(new ProxyServerVerticle());
     }
 }

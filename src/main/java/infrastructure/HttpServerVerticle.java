@@ -1,12 +1,11 @@
 package infrastructure;
 
 import domain.application.AttractionApplicationService;
+import domain.application.UploadsApplicationService;
 import domain.application.UserApplicationService;
-import domain.application.command.AddAttractionCommand;
-import domain.application.command.CreateUserCommand;
-import domain.application.command.DeleteUserCommand;
-import domain.application.command.RemoveAttractionCommand;
+import domain.application.command.*;
 import domain.application.query.GetSavedAttractionsQuery;
+import domain.application.query.GetUploadsByIdQuery;
 import domain.application.query.LogInQuery;
 import domain.model.Attraction;
 import io.vertx.core.AbstractVerticle;
@@ -17,22 +16,63 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 
+import java.io.File;
+
 public class HttpServerVerticle extends AbstractVerticle {
     private final Vertx vertx = Vertx.vertx();
     private final HttpServer server = vertx.createHttpServer();
     private final Router router = Router.router(vertx);
     private final UserApplicationService userApplicationService;
     private final AttractionApplicationService attractionApplicationService;
+    private final UploadsApplicationService uploadsApplicationService;
 
-    public HttpServerVerticle(UserApplicationService userApplicationService, AttractionApplicationService attractionApplicationService) {
+    public HttpServerVerticle(UserApplicationService userApplicationService, AttractionApplicationService attractionApplicationService, UploadsApplicationService uploadsApplicationService) {
         this.userApplicationService = userApplicationService;
         this.attractionApplicationService = attractionApplicationService;
+        this.uploadsApplicationService = uploadsApplicationService;
     }
 
     @Override
     public void start()  {
 
         router.route().handler(BodyHandler.create());
+
+        router.get("/api/user/:id/uploads").produces("*/json").handler(context ->{
+            context.response().setChunked(true);
+            GetUploadsByIdQuery query = new GetUploadsByIdQuery(context.pathParam("id"));
+            uploadsApplicationService.execute(query).subscribe(
+                    files -> {
+                        JsonArray array = new JsonArray();
+                        for(File file : files){
+                            JsonObject jsonObject = new JsonObject();
+                            jsonObject.put("file",file);
+                            array.add(jsonObject);
+                        }
+                        context.response().write(array.toString());
+                        context.response().end();
+                    },
+                    error -> {
+                        context.response().write(error.toString());
+                        context.response().end();
+                    }
+            );
+        });
+
+        router.post("/api/user/:id/uploads").consumes("*/json").handler(context ->{
+            context.response().setChunked(true);
+            JsonObject body = context.getBodyAsJson();
+            byte[] bytes = context.getBody().getBytes();
+            AddFileCommand command = new AddFileCommand(context.pathParam("id"),bytes);
+            uploadsApplicationService.execute(command).subscribe(
+                    ()->{
+                        context.response().end();
+                    },
+                    error ->{
+                        context.response().write(error.toString());
+                        context.response().end();
+                    }
+            );
+        });
 
         router.get("/api/user").produces("*/json").handler(context -> {
             context.response().setChunked(true);
