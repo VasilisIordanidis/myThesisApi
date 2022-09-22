@@ -1,5 +1,6 @@
 package infrastructure;
 
+import com.mchange.io.FileUtils;
 import domain.model.UploadRepository;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
@@ -9,9 +10,11 @@ import io.vertx.jdbcclient.JDBCPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -67,9 +70,9 @@ public class PostgresUploadsRepository implements UploadRepository {
                             connection.close();
                         })
                         .onSuccess(rows -> {
-                            Set<File> set = new HashSet<>();
                             for(Row row : rows){
-                                //set.add(row.getBuffer("img"));
+                                //String encodedString = Base64.getEncoder().encodeToString(row.getBuffer("img").getBytes());
+
                             }
                         })
                 )

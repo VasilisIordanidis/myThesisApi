@@ -60,9 +60,10 @@ public class HttpServerVerticle extends AbstractVerticle {
 
         router.post("/api/user/:id/uploads").consumes("*/json").handler(context ->{
             context.response().setChunked(true);
-            JsonObject body = context.getBodyAsJson();
-            byte[] bytes = context.getBody().getBytes();
-            AddFileCommand command = new AddFileCommand(context.pathParam("id"),bytes);
+            //Buffer body = context.getBody();
+            //context.getBody().;
+            byte[] file = context.getBody().getBytes();
+            AddFileCommand command = new AddFileCommand(context.pathParam("id"),file);
             uploadsApplicationService.execute(command).subscribe(
                     ()->{
                         context.response().end();
