@@ -4,18 +4,18 @@ import java.io.File;
 
 public class AddFileCommand {
     private String id;
-    private byte[] file;
+    private String fileData;
 
-    public AddFileCommand(String id, byte[] file) {
+    public AddFileCommand(String id, String fileData) {
         this.id = id;
-        this.file = file;
+        this.fileData = fileData;
     }
 
     public String getId() {
         return id;
     }
 
-    public byte[] getFile() {
-        return file;
+    public String getFile() {
+        return fileData;
     }
 }

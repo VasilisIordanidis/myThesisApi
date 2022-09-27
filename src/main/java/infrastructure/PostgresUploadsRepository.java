@@ -28,14 +28,14 @@ public class PostgresUploadsRepository implements UploadRepository {
 
     private final JDBCPool pool = JDBCPool.pool(vertx, config);
     @Override
-    public Completable addUpload(String id, byte[] file) {
+    public Completable addUpload(String id,String fileData) {
         return Completable.create(emitter -> pool.getConnection()
                 .onFailure(error -> {
                     System.out.println(error.getCause().getMessage());
                     emitter.onError(error);
                 })
-                .onSuccess(connection -> connection.preparedQuery("INSERT INTO public.\"Uploads\" (account_id,img) VALUES (?,?)")
-                        .execute(Tuple.of(UUID.fromString(id), file))
+                .onSuccess(connection -> connection.preparedQuery("INSERT INTO public.\"Uploads\" (account_id,file) VALUES (?,?)")
+                        .execute(Tuple.of(UUID.fromString(id), fileData))
                         .onFailure(error -> {
                             System.out.println(error);
                             emitter.onError(error);
@@ -56,7 +56,7 @@ public class PostgresUploadsRepository implements UploadRepository {
     }
 
     @Override
-    public Single<Set<File>> getUploads(String id) {
+    public Single<Set<String>> getUploads(String id) {
         return Single.create(emitter -> pool.getConnection()
                 .onFailure(error -> {
                     System.out.println(error.getCause().getMessage());
@@ -70,10 +70,12 @@ public class PostgresUploadsRepository implements UploadRepository {
                             connection.close();
                         })
                         .onSuccess(rows -> {
+                            Set<String> files = new HashSet<>();
                             for(Row row : rows){
-                                //String encodedString = Base64.getEncoder().encodeToString(row.getBuffer("img").getBytes());
-
+                                files.add(row.getString("file"));
                             }
+                            emitter.onSuccess(files);
+                            connection.close();
                         })
                 )
         );

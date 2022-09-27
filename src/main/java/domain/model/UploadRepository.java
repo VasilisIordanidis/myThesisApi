@@ -7,6 +7,6 @@ import java.io.*;
 import java.util.Set;
 
 public interface UploadRepository {
-    Completable addUpload(String id, byte[] file) throws IOException;
-    Single<Set<File>> getUploads(String id);
+    Completable addUpload(String id, String fileData);
+    Single<Set<String>> getUploads(String id);
 }

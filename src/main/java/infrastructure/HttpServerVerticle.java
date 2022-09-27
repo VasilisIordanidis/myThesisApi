@@ -17,6 +17,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 
 import java.io.File;
+import java.io.IOException;
 
 public class HttpServerVerticle extends AbstractVerticle {
     private final Vertx vertx = Vertx.vertx();
@@ -43,7 +44,7 @@ public class HttpServerVerticle extends AbstractVerticle {
             uploadsApplicationService.execute(query).subscribe(
                     files -> {
                         JsonArray array = new JsonArray();
-                        for(File file : files){
+                        for(String file : files){
                             JsonObject jsonObject = new JsonObject();
                             jsonObject.put("file",file);
                             array.add(jsonObject);
@@ -60,19 +61,19 @@ public class HttpServerVerticle extends AbstractVerticle {
 
         router.post("/api/user/:id/uploads").consumes("*/json").handler(context ->{
             context.response().setChunked(true);
-            //Buffer body = context.getBody();
-            //context.getBody().;
-            byte[] file = context.getBody().getBytes();
-            AddFileCommand command = new AddFileCommand(context.pathParam("id"),file);
+            JsonObject bodyAsJson = context.getBodyAsJson();
+            String fileData = bodyAsJson.getString("data");
+            AddFileCommand command = new AddFileCommand(context.pathParam("id"),fileData);
             uploadsApplicationService.execute(command).subscribe(
-                    ()->{
-                        context.response().end();
-                    },
-                    error ->{
-                        context.response().write(error.toString());
-                        context.response().end();
-                    }
-            );
+                        ()->{
+                            context.response().end();
+                        },
+                        error ->{
+                            context.response().write(error.toString());
+                            context.response().end();
+                        }
+                );
+
         });
 
         router.get("/api/user").produces("*/json").handler(context -> {
