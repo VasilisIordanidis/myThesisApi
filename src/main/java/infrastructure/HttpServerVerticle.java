@@ -44,12 +44,14 @@ public class HttpServerVerticle extends AbstractVerticle {
             uploadsApplicationService.execute(query).subscribe(
                     files -> {
                         JsonArray array = new JsonArray();
+                        JsonObject object = new JsonObject();
                         for(String file : files){
                             JsonObject jsonObject = new JsonObject();
                             jsonObject.put("file",file);
                             array.add(jsonObject);
                         }
-                        context.response().write(array.toString());
+                        object.put("set",array);
+                        context.response().write(object.toString());
                         context.response().end();
                     },
                     error -> {
